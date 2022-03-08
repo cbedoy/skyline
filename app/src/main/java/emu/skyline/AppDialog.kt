@@ -72,7 +72,7 @@ class AppDialog : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         view.setBackgroundColor(requireContext().getColor(R.color.backgroundColor))
 
-        val missingIcon = ContextCompat.getDrawable(requireActivity(), R.drawable.default_icon)!!.toBitmap(256, 256)
+        val missingIcon = ContextCompat.getDrawable(requireActivity(), R.drawable.default_icon)?.toBitmap(256, 256)
 
         binding.gameIcon.setImageBitmap(item.icon ?: missingIcon)
         binding.gameTitle.text = item.title

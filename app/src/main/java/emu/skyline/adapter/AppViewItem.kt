@@ -81,7 +81,7 @@ class GridCompatBinding(parent : ViewGroup) : LayoutBinding<AppItemGridCompactBi
 
 private typealias InteractionFunction = (appItem : AppItem) -> Unit
 
-class AppViewItem(var layoutType : LayoutType, private val item : AppItem, private val missingIcon : Bitmap, private val onClick : InteractionFunction, private val onLongClick : InteractionFunction) : GenericListItem<LayoutBinding<*>>() {
+class AppViewItem(var layoutType : LayoutType, private val item : AppItem, private val missingIcon : Bitmap?, private val onClick : InteractionFunction, private val onLongClick : InteractionFunction) : GenericListItem<LayoutBinding<*>>() {
     override fun getViewBindingFactory() = LayoutBindingFactory(layoutType)
 
     override fun bind(binding : LayoutBinding<*>, position : Int) {
@@ -103,7 +103,7 @@ class AppViewItem(var layoutType : LayoutType, private val item : AppItem, priva
     private fun showIconDialog(context : Context, appItem : AppItem) {
         val builder = Dialog(context)
         builder.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        builder.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        builder.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
         val imageView = ImageView(context)
         imageView.setImageBitmap(appItem.icon ?: missingIcon)

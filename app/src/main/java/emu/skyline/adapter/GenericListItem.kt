@@ -13,7 +13,7 @@ import androidx.viewbinding.ViewBinding
 
 class GenericViewHolder<out V : ViewBinding>(val binding : V) : RecyclerView.ViewHolder(binding.root)
 
-fun View.inflater() = LayoutInflater.from(context)!!
+fun View.inflater() = LayoutInflater.from(context)
 
 interface ViewBindingFactory {
     fun createBinding(parent : ViewGroup) : ViewBinding

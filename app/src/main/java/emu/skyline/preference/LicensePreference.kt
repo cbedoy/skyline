@@ -47,11 +47,13 @@ class LicensePreference @JvmOverloads constructor(context : Context, attrs : Att
     private var libraryLicense = 0
 
     init {
-        for (i in 0 until attrs!!.attributeCount) {
-            when (attrs.getAttributeName(i)) {
-                LIBRARY_URL_ARG -> libraryUrl = attrs.getAttributeValue(i)
-                LIBRARY_COPYRIGHT_ARG -> libraryCopyright = attrs.getAttributeValue(i)
-                LIBRARY_LICENSE_ARG -> libraryLicense = attrs.getAttributeValue(i).substring(1).toInt()
+        attrs?.let {
+            for (i in 0 until attrs.attributeCount) {
+                when (attrs.getAttributeName(i)) {
+                    LIBRARY_URL_ARG -> libraryUrl = attrs.getAttributeValue(i)
+                    LIBRARY_COPYRIGHT_ARG -> libraryCopyright = attrs.getAttributeValue(i)
+                    LIBRARY_LICENSE_ARG -> libraryLicense = attrs.getAttributeValue(i).substring(1).toInt()
+                }
             }
         }
     }

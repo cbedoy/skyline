@@ -199,9 +199,9 @@ class EmulationActivity : AppCompatActivity(), SurfaceHolder.Callback, View.OnTo
         if (emulationThread?.isAlive == true) {
             shouldFinish = false
             if (stopEmulation(false))
-                emulationThread!!.join(250)
+                emulationThread?.join(250)
 
-            if (emulationThread!!.isAlive) {
+            if (emulationThread?.isAlive == true) {
                 finishAffinity()
                 startActivity(intent)
                 Runtime.getRuntime().exit(0)
@@ -211,17 +211,27 @@ class EmulationActivity : AppCompatActivity(), SurfaceHolder.Callback, View.OnTo
         shouldFinish = true
         returnToMain = intent.getBooleanExtra(ReturnToMainTag, false)
 
-        val rom = intent.data!!
-        val romType = getRomFormat(rom, contentResolver).ordinal
-        val romFd = contentResolver.openFileDescriptor(rom, "r")!!
-        val preferenceFd = ParcelFileDescriptor.open(File("${applicationInfo.dataDir}/shared_prefs/${applicationInfo.packageName}_preferences.xml"), ParcelFileDescriptor.MODE_READ_WRITE)
+        intent.data?.let { rom ->
+            val romType = getRomFormat(rom, contentResolver).ordinal
+            val romFd = contentResolver.openFileDescriptor(rom, "r")
+            val preferenceFd = ParcelFileDescriptor.open(File("${applicationInfo.dataDir}/shared_prefs/${applicationInfo.packageName}_preferences.xml"), ParcelFileDescriptor.MODE_READ_WRITE)
 
-        emulationThread = Thread {
-            executeApplication(rom.toString(), romType, romFd.detachFd(), preferenceFd.detachFd(), settings.systemLanguage, applicationContext.filesDir.canonicalPath + "/", applicationInfo.nativeLibraryDir + "/", assets)
-            returnFromEmulation()
+            emulationThread = Thread {
+                executeApplication(
+                    romUri = rom.toString(),
+                    romType = romType,
+                    romFd = romFd?.detachFd()?:0,
+                    preferenceFd = preferenceFd.detachFd(),
+                    language = settings.systemLanguage,
+                    appFilesPath = applicationContext.filesDir.canonicalPath + "/",
+                    nativeLibraryPath = applicationInfo.nativeLibraryDir + "/",
+                    assetManager = assets
+                )
+                returnFromEmulation()
+            }
+
+            emulationThread?.start()
         }
-
-        emulationThread!!.start()
     }
 
     override fun onBackPressed() {
@@ -263,7 +273,7 @@ class EmulationActivity : AppCompatActivity(), SurfaceHolder.Callback, View.OnTo
             }
         }
 
-        @Suppress("DEPRECATION") val display = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) display!! else windowManager.defaultDisplay
+        @Suppress("DEPRECATION") val display = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) display else windowManager.defaultDisplay
         if (settings.maxRefreshRate) {
             display?.supportedModes?.maxByOrNull { it.refreshRate * it.physicalHeight * it.physicalWidth }?.let { window.attributes.preferredDisplayModeId = it.modeId; desiredRefreshRate = it.refreshRate }
         } else {
@@ -274,7 +284,7 @@ class EmulationActivity : AppCompatActivity(), SurfaceHolder.Callback, View.OnTo
 
         // Hide on screen controls when first controller is not set
         binding.onScreenControllerView.apply {
-            inputManager.controllers[0]!!.type.let {
+            inputManager.controllers[0]?.type.let {
                 controllerType = it
                 isGone = it == ControllerType.None || !settings.onScreenControl
             }
@@ -288,7 +298,9 @@ class EmulationActivity : AppCompatActivity(), SurfaceHolder.Callback, View.OnTo
             setOnClickListener { binding.onScreenControllerView.isInvisible = !binding.onScreenControllerView.isInvisible }
         }
 
-        executeApplication(intent!!)
+        intent?.let {
+            executeApplication(intent)
+        }
     }
 
     override fun onPause() {
@@ -317,10 +329,12 @@ class EmulationActivity : AppCompatActivity(), SurfaceHolder.Callback, View.OnTo
      * Stop the currently executing ROM and replace it with the one specified in the new intent
      */
     override fun onNewIntent(intent : Intent?) {
-        super.onNewIntent(intent!!)
+        super.onNewIntent(intent)
         if (getIntent().data != intent.data) {
             setIntent(intent)
-            executeApplication(intent)
+            intent?.let {
+                executeApplication(intent)
+            }
         }
     }
 
@@ -340,7 +354,7 @@ class EmulationActivity : AppCompatActivity(), SurfaceHolder.Callback, View.OnTo
             // Note: We need FRAME_RATE_COMPATIBILITY_FIXED_SOURCE as there will be a degradation of user experience with FRAME_RATE_COMPATIBILITY_DEFAULT due to game speed alterations when the frame rate doesn't match the display refresh rate
             holder.surface.setFrameRate(desiredRefreshRate, if (settings.maxRefreshRate) Surface.FRAME_RATE_COMPATIBILITY_DEFAULT else Surface.FRAME_RATE_COMPATIBILITY_FIXED_SOURCE)
 
-        while (emulationThread!!.isAlive)
+        while (emulationThread?.isAlive == true)
             if (setSurface(holder.surface))
                 return
     }
@@ -357,7 +371,7 @@ class EmulationActivity : AppCompatActivity(), SurfaceHolder.Callback, View.OnTo
 
     override fun surfaceDestroyed(holder : SurfaceHolder) {
         Log.d(Tag, "surfaceDestroyed Holder: $holder")
-        while (emulationThread!!.isAlive)
+        while (emulationThread?.isAlive == true)
             if (setSurface(null))
                 return
     }
@@ -490,7 +504,7 @@ class EmulationActivity : AppCompatActivity(), SurfaceHolder.Callback, View.OnTo
         val vibrator = if (vibrators[index] != null) {
             vibrators[index]
         } else {
-            inputManager.controllers[index]!!.rumbleDeviceDescriptor?.let {
+            inputManager.controllers[index]?.rumbleDeviceDescriptor?.let {
                 if (it == Controller.BuiltinRumbleDeviceDescriptor) {
                     val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                         val vibratorManager = getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
@@ -504,12 +518,12 @@ class EmulationActivity : AppCompatActivity(), SurfaceHolder.Callback, View.OnTo
                 } else {
                     for (id in InputDevice.getDeviceIds()) {
                         val device = InputDevice.getDevice(id)
-                        if (device.descriptor == inputManager.controllers[index]!!.rumbleDeviceDescriptor) {
+                        if (device.descriptor == inputManager.controllers[index]?.rumbleDeviceDescriptor) {
                             val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                                 device.vibratorManager.defaultVibrator
                             } else {
                                 @Suppress("DEPRECATION")
-                                device.vibrator!!
+                                device.vibrator
                             }
                             vibrators[index] = vibrator
                             return@let vibrator

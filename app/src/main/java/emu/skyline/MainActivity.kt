@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity() {
 
     private val layoutType get() = LayoutType.values()[settings.layoutType.toInt()]
 
-    private val missingIcon by lazy { ContextCompat.getDrawable(this, R.drawable.default_icon)!!.toBitmap(256, 256) }
+    private val missingIcon get() = ContextCompat.getDrawable(this, R.drawable.default_icon)?.toBitmap(256, 256)
 
     private val viewModel by viewModels<MainViewModel>()
 
@@ -207,9 +207,10 @@ class MainActivity : AppCompatActivity() {
                         val current = binding.appList.indexOfChild(focusedChild)
                         val currentSpanIndex = (focusedChild.layoutParams as LayoutParams).spanIndex
                         for (i in current + 1 until binding.appList.size) {
-                            val candidate = getChildAt(i)!!
                             // Return candidate when span index matches
-                            if (currentSpanIndex == (candidate.layoutParams as LayoutParams).spanIndex) return candidate
+                            getChildAt(i)?.let { candidate ->
+                                if (currentSpanIndex == (candidate.layoutParams as LayoutParams).spanIndex) return candidate
+                            }
                         }
                         nextFocus?.let { if ((it.layoutParams as LayoutParams).spanIndex == currentSpanIndex) return nextFocus }
 

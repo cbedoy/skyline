@@ -35,7 +35,7 @@ abstract class OnScreenButton(
     val config = if (onScreenControllerView.isInEditMode) ControllerConfigurationDummy(defaultRelativeX, defaultRelativeY)
     else ControllerConfigurationImpl(onScreenControllerView.context, buttonId, defaultRelativeX, defaultRelativeY)
 
-    protected val drawable = ContextCompat.getDrawable(onScreenControllerView.context, drawableId)!!
+    protected val drawable = ContextCompat.getDrawable(onScreenControllerView.context, drawableId)
 
     private val buttonSymbolPaint = Paint().apply { color = Color.GRAY }
     private val textBoundsRect = Rect()
