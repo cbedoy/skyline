@@ -196,7 +196,7 @@ class ControllerActivity : AppCompatActivity() {
                 for (i in 0 until parent.childCount) {
                     val view = parent.getChildAt(i)
                     val position = parent.getChildAdapterPosition(view)
-                    if (position != RecyclerView.NO_POSITION && parent.adapter!!.getItemViewType(position) == adapter.getFactoryViewType(ControllerHeaderBindingFactory)) {
+                    if (position != RecyclerView.NO_POSITION && parent.adapter?.getItemViewType(position) == adapter.getFactoryViewType(ControllerHeaderBindingFactory)) {
                         val bottom = view.top - view.marginTop
                         val top = bottom - divider.intrinsicHeight
                         divider.setBounds(0, top, parent.width, bottom)
@@ -221,7 +221,7 @@ class ControllerActivity : AppCompatActivity() {
     }
 
     private val onControllerTypeClick = { item : ControllerTypeViewItem, _ : Int ->
-        val controller = inputManager.controllers[id]!!
+        val controller = inputManager.controllers[id]
 
         val types = ControllerType.values().apply { if (id != 0) filter { !it.firstController } }
         val typeNames = types.map { getString(it.stringRes) }.toTypedArray()
@@ -230,7 +230,7 @@ class ControllerActivity : AppCompatActivity() {
             .setTitle(item.content)
             .setSingleChoiceItems(typeNames, types.indexOf(controller.type)) { dialog, typeIndex ->
                 val selectedType = types[typeIndex]
-                if (controller.type != selectedType) {
+                if (controller?.type != selectedType) {
                     if (controller is JoyConLeftController)
                         controller.partnerId?.let { (inputManager.controllers[it] as JoyConRightController).partnerId = null }
                     else if (controller is JoyConRightController)

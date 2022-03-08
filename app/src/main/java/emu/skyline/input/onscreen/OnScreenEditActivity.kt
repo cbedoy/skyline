@@ -39,15 +39,15 @@ class OnScreenEditActivity : AppCompatActivity() {
         } else {
             fullEditVisible = !fullEditVisible
             toggleFabVisibility(fullEditVisible)
-            fabMapping[R.drawable.ic_close]!!.animate().rotation(if (fullEditVisible) 0f else 45f)
+            fabMapping[R.drawable.ic_close]?.animate()?.rotation(if (fullEditVisible) 0f else 45f)
         }
     }
 
     private fun toggleFabVisibility(visible : Boolean) {
         actions.forEach {
             if (it.first != R.drawable.ic_close)
-                if (visible) fabMapping[it.first]!!.show()
-                else fabMapping[it.first]!!.hide()
+                if (visible) fabMapping[it.first]?.show()
+                else fabMapping[it.first]?.hide()
         }
     }
 

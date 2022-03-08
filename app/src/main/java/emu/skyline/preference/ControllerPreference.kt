@@ -37,12 +37,14 @@ class ControllerPreference @JvmOverloads constructor(context : Context, attrs : 
     private val inputManager = context.getInputManager()
 
     init {
-        for (i in 0 until attrs!!.attributeCount) {
-            val attr = attrs.getAttributeName(i)
+        attrs?.let {
+            for (i in 0 until attrs.attributeCount) {
+                val attr = attrs.getAttributeName(i)
 
-            if (attr.equals(INDEX_ARG)) {
-                index = attrs.getAttributeValue(i).toInt()
-                break
+                if (attr.equals(INDEX_ARG)) {
+                    index = attrs.getAttributeValue(i).toInt()
+                    break
+                }
             }
         }
 
@@ -53,7 +55,7 @@ class ControllerPreference @JvmOverloads constructor(context : Context, attrs : 
             key = "controller_$index"
 
         title = "${context.getString(R.string.config_controller)} #${index + 1}"
-        summaryProvider = SummaryProvider<ControllerPreference> { inputManager.controllers[index]!!.type.stringRes.let { context.getString(it) } }
+        summaryProvider = SummaryProvider<ControllerPreference> { inputManager.controllers[index]?.type?.stringRes?.let { context.getString(it) } }
     }
 
     /**

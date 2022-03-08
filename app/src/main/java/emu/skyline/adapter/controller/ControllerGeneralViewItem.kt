@@ -21,7 +21,7 @@ import emu.skyline.input.JoyConLeftController
 class ControllerGeneralViewItem(private val controllerId : Int, val type : GeneralType, private val onClick : (item : ControllerGeneralViewItem, position : Int) -> Unit) : ControllerViewItem() {
     override fun bind(binding : ControllerItemBinding, position : Int) {
         val context = binding.root.context
-        val controller = context.getInputManager().controllers[controllerId]!!
+        val controller = context.getInputManager().controllers[controllerId]
 
         content = context.getString(type.stringRes)
         subContent = when (type) {
@@ -34,7 +34,7 @@ class ControllerGeneralViewItem(private val controllerId : Int, val type : Gener
                     context.getString(R.string.none)
             }
 
-            GeneralType.RumbleDevice -> controller.rumbleDeviceName ?: context.getString(R.string.none)
+            GeneralType.RumbleDevice -> controller?.rumbleDeviceName ?: context.getString(R.string.none)
         }
         super.bind(binding, position)
 

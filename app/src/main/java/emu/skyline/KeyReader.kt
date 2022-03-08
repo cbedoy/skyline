@@ -35,7 +35,7 @@ object KeyReader {
 
         val inputStream = context.contentResolver.openInputStream(uri)
         tmpOutputFile.bufferedWriter().use { writer ->
-            val valid = inputStream!!.bufferedReader().useLines {
+            val isValid = inputStream?.bufferedReader()?.useLines {
                 for (line in it) {
                     if (line.startsWith(";") || line.isBlank()) continue
 
@@ -65,8 +65,8 @@ object KeyReader {
                 true
             }
 
-            if (valid) tmpOutputFile.renameTo(File("${tmpOutputFile.parent}/${keyType.fileName}"))
-            return valid
+            if (isValid == true) tmpOutputFile.renameTo(File("${tmpOutputFile.parent}/${keyType.fileName}"))
+            return isValid?: false
         }
     }
 
